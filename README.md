@@ -8,7 +8,7 @@ A full-stack intelligence dashboard for tracking incoming, rumored, and confirme
 - TypeScript
 - Tailwind CSS
 - Prisma ORM
-- SQLite (default local database)
+- PostgreSQL (recommended for local + Netlify)
 
 ## Features
 
@@ -31,25 +31,31 @@ A full-stack intelligence dashboard for tracking incoming, rumored, and confirme
 npm install
 ```
 
-2. Create local environment file:
+2. Start a local PostgreSQL database (Docker example):
+
+```bash
+docker run --name pottco-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=pottco_tracker -p 5432:5432 -d postgres:16
+```
+
+3. Create local environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Generate Prisma client and initialize database:
+4. Generate Prisma client and initialize database:
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-4. Seed starter data:
+5. Seed starter data:
 
 ```bash
 npm run prisma:seed
 ```
 
-5. Start development server:
+6. Start development server:
 
 ```bash
 npm run dev
@@ -57,10 +63,29 @@ npm run dev
 
 Open http://localhost:3000.
 
-## Production Notes
+## Deploy to Netlify (Fix for non-loading deploys)
 
-- The app is currently configured for SQLite. For PostgreSQL, update `prisma/schema.prisma` datasource provider and set `DATABASE_URL` to your Postgres connection string.
-- The data model is prepared for future integrations from city agendas, planning commission packets, permits, job postings, CRE listings, and local news feeds.
+This repository now includes `netlify.toml` with the official Next.js Netlify plugin and a Netlify build script:
+
+- Build command: `npm run netlify-build`
+- Plugin: `@netlify/plugin-nextjs`
+
+### Netlify environment variables
+
+Set this required variable in Netlify Site Settings:
+
+- `DATABASE_URL` = your managed PostgreSQL connection string (Neon, Supabase, RDS, etc.)
+
+> Important: SQLite file databases are not reliable for Netlify serverless deployments because filesystem writes are ephemeral.
+
+### First-time database setup for production
+
+Run migrations against your production database (from your machine/CI):
+
+```bash
+npx prisma migrate deploy
+npm run prisma:seed
+```
 
 ## Seed Data Included
 

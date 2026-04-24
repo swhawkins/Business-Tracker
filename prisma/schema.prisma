@@ -1,9 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -64,14 +65,14 @@ model Briefing {
 }
 
 model ActivityLog {
-  id        Int      @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   businessId Int
-  action    String
-  oldValue  String?
-  newValue  String?
-  timestamp DateTime @default(now())
-  userNote  String?
-  business  Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  action     String
+  oldValue   String?
+  newValue   String?
+  timestamp  DateTime @default(now())
+  userNote   String?
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
 
 model ConfidenceHistory {

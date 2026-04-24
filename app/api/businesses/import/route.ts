@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { prisma } from '@/lib/prisma';
 import Papa from 'papaparse';
 import { NextResponse } from 'next/server';
