@@ -1,0 +1,91 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id                Int                 @id @default(autoincrement())
+  businessName      String
+  businessType      String
+  city              String
+  county            String              @default("Pottawatomie")
+  address           String?
+  parcelNumber      String?
+  latitude          Float?
+  longitude         Float?
+  status            String
+  stage             String
+  confidenceScore   Int
+  description       String?
+  notes             String?
+  firstDetectedDate DateTime            @default(now())
+  lastUpdatedDate   DateTime            @updatedAt
+  isArchived        Boolean             @default(false)
+  sources           Source[]
+  activities        ActivityLog[]
+  confidenceHistory ConfidenceHistory[]
+}
+
+model Source {
+  id               Int      @id @default(autoincrement())
+  businessId       Int
+  sourceName       String
+  sourceType       String
+  url              String?
+  dateFound        DateTime
+  summary          String?
+  reliabilityScore Int      @default(50)
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model WatchZone {
+  id            Int    @id @default(autoincrement())
+  zoneName      String
+  description   String
+  city          String
+  priorityLevel String
+  notes         String?
+}
+
+model Briefing {
+  id                        Int      @id @default(autoincrement())
+  briefingDate              DateTime
+  title                     String
+  summary                   String
+  confirmedUpdates          String
+  earlySignals              String
+  rumors                    String
+  debunkedItems             String
+  recommendedTrackerUpdates String
+}
+
+model ActivityLog {
+  id         Int      @id @default(autoincrement())
+  businessId Int
+  action     String
+  oldValue   String?
+  newValue   String?
+  timestamp  DateTime @default(now())
+  userNote   String?
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model ConfidenceHistory {
+  id         Int      @id @default(autoincrement())
+  businessId Int
+  score      Int
+  recordedAt DateTime @default(now())
+  note       String?
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model AppSetting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+}
